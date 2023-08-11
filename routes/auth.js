@@ -3,7 +3,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // We'll create this model in the next step
+const User = require('../models/User'); 
+require("dotenv").config();
+const SECRET_KEY_JWT = `${process.env.SECRET_KEY_JWT}`;
 
 // Signup route
 router.post('/signup', async (req, res) => {
@@ -50,14 +52,16 @@ router.post('/login', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+
     // Check if the password matches
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    console.log({ SECRET_KEY_JWT });
     // Create and send a JWT token for user authentication
-    const token = jwt.sign({ userId: user._id }, 'your_secret_key_here', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, SECRET_KEY_JWT, { expiresIn: '4h' });
     res.json({ token });
   } catch (error) {
     console.error(error);
